@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import pickle
 import pandas as pd
 
-# Bonjour à tous, ici paris
+# Bonjour à tous, ici paris vers londre 
 app = Flask(__name__)
 model = pickle.load(open("catboost_model-2.pkl", "rb"))
 
