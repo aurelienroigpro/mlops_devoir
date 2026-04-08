@@ -1,4 +1,3 @@
-# Hola
 from flask import Flask, request, render_template
 import numpy as np
 import pickle
@@ -36,8 +35,12 @@ def predict():
             prediction_text=f"Prediction : {prediction}"
         )
 
-    except Exception as e:
-        return str(e)
+    except ValueError as e:
+        # erreur de conversion en float
+        return render_template("index.html", prediction_text=f"Erreur de saisie : {e}")
+    except KeyError as e:
+        # champ manquant dans le formulaire
+        return render_template("index.html", prediction_text=f"Champ manquant : {e}")
 
 if __name__ == "__main__":
     app.run(debug=True)
