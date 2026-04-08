@@ -1,51 +1,43 @@
-from flask import Flask, render_template, request
+# Hola
+from flask import Flask, request, render_template
+import numpy as np
 import pickle
-import pandas as pd
 
-# Bonjour à tous, ici paris vers londres pour un 14eme essai avec accès docker configurés. Et maintenant modif nom service
-# Wesh tu vas commit!
 app = Flask(__name__)
-model = pickle.load(open("catboost_model-2.pkl", "rb"))
 
+# 🔹 Charger le modèle Logistic Regression
+model = pickle.load(open("models/LogisticRegression.pkl", "rb"))
 
-def model_pred(features):
-    test_data = pd.DataFrame([features])
-    prediction = model.predict(test_data)
-    return int(prediction[0])
-
-
-@app.route("/", methods=["GET"])
-def Home():
+@app.route("/")
+def home():
     return render_template("index.html")
-
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    if request.method == "POST":
-        Age = int(request.form["Age"])
-        RestingBP = int(request.form["RestingBP"])
-        Cholesterol = int(request.form["Cholesterol"])
-        Oldpeak = float(request.form["Oldpeak"])
-        FastingBS = int(request.form["FastingBS"])
-        MaxHR = int(request.form["MaxHR"])
-        prediction = model.predict(
-            [[Age, RestingBP, Cholesterol, FastingBS, MaxHR, Oldpeak]]
+    try:
+        # 🔹 Récupérer les inputs du formulaire
+        features = [
+            float(request.form["credit_lines_outstanding"]),
+            float(request.form["loan_amt_outstanding"]),
+            float(request.form["total_debt_outstanding"]),
+            float(request.form["income"]),
+            float(request.form["years_employed"]),
+            float(request.form["fico_score"])
+        ]
+
+        # 🔹 Transformer en format compatible modèle
+        final_features = np.array(features).reshape(1, -1)
+
+        # 🔹 Prédiction
+        prediction = model.predict(final_features)[0]
+
+        return render_template(
+            "index.html",
+            prediction_text=f"Prediction : {prediction}"
         )
 
-        if prediction[0] == 1:
-            return render_template(
-                "index.html",
-                prediction_text="Kindly make an appointment with the doctor!",
-            )
-
-        else:
-            return render_template(
-                "index.html", prediction_text="You are well. No worries :)"
-            )
-
-    else:
-        return render_template("index.html")
-
+    except Exception as e:
+        return str(e)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
