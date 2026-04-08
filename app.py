@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 
 app = Flask(__name__)
-
+# commentaire:
 # 🔹 Charger le modèle Logistic Regression
 model = pickle.load(open("LogisticRegression.pkl", "rb"))
 
