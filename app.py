@@ -4,7 +4,7 @@ import pickle
 
 app = Flask(__name__)
 # commentaire:
-# 🔹 Charger le modèle Logistic Regression
+# Chargement du meilleur modèle: Logistic Regression
 model = pickle.load(open("LogisticRegression.pkl", "rb"))
 
 @app.route("/")
@@ -14,7 +14,7 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # 🔹 Récupérer les inputs du formulaire
+        # Récupération des inputs du formulaire
         features = [
             float(request.form["credit_lines_outstanding"]),
             float(request.form["loan_amt_outstanding"]),
@@ -24,17 +24,17 @@ def predict():
             float(request.form["fico_score"])
         ]
 
-        # 🔹 Transformer en format compatible modèle
+        # Transformation en format compatible modèle
         final_features = np.array(features).reshape(1, -1)
 
-        # 🔹 Prédiction
+        # Réalisation de la Prédiction
         prediction = model.predict(final_features)[0]
 
         return render_template(
             "index.html",
             prediction_text=f"Prediction : {prediction}"
         )
-
+# Gestion des erreurs:
     except ValueError as e:
         # erreur de conversion en float
         return render_template("index.html", prediction_text=f"Erreur de saisie : {e}")
